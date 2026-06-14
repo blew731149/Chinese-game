@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中文词语练习 — Shanghai American School</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#2563EB;--blue-dk:#1E3A8A;--blue-lt:#DBEAFE;
+  --green:#16A34A;--green-lt:#DCFCE7;
+  --orange:#EA580C;--orange-lt:#FFEDD5;
+  --purple:#7C3AED;--purple-lt:#EDE9FE;
+  --red:#DC2626;--red-lt:#FEE2E2;
+  --gray-lt:#F3F4F6;--gray-bd:#E5E7EB;
+  --text:#111827;--text-2:#6B7280;--text-3:#9CA3AF;
+  --bg:#F0F4F8;
+  --r:12px;--r-sm:8px;
+  --shadow:0 1px 8px rgba(0,0,0,.08);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.15)
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+#screen-entry{display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1E3A8A 0%,#2563EB 55%,#16A34A 100%);min-height:100vh}
+
+/* ── ENTRY CARD ── */
+.entry-card{background:#fff;border-radius:20px;padding:2.5rem 2rem;width:360px;box-shadow:var(--shadow-lg);text-align:center}
+.entry-logo{font-size:54px;margin-bottom:.5rem}
+.entry-title{font-size:22px;font-weight:700;color:var(--blue-dk);margin-bottom:.2rem;font-family:SimSun,serif}
+.entry-sub{font-size:13px;color:var(--text-2);margin-bottom:1.75rem}
+.role-row{display:flex;gap:10px;margin-bottom:1.25rem}
+.role-btn{flex:1;padding:14px 8px;border-radius:var(--r-sm);border:2px solid var(--gray-bd);background:var(--gray-lt);cursor:pointer;transition:all .15s;text-align:center}
+.role-btn:hover{border-color:var(--blue);background:var(--blue-lt)}
+.role-btn.sel{border-color:var(--blue);background:var(--blue-lt)}
+.role-icon{font-size:28px;display:block;margin-bottom:4px}
+.role-name{font-size:13px;font-weight:600;color:var(--text)}
+.role-desc{font-size:11px;color:var(--text-2);margin-top:2px}
+.name-input{width:100%;padding:13px 16px;border-radius:var(--r-sm);border:1.5px solid var(--gray-bd);font-size:16px;font-family:SimSun,serif;text-align:center;outline:none;transition:border .15s;margin-bottom:.75rem}
+.name-input:focus{border-color:var(--blue)}
+.pwd-input{width:100%;padding:13px 16px;border-radius:var(--r-sm);border:1.5px solid var(--gray-bd);font-size:15px;outline:none;transition:border .15s;margin-bottom:.75rem;display:none}
+.pwd-input:focus{border-color:var(--blue)}
+.entry-btn{width:100%;padding:13px;border-radius:var(--r-sm);background:var(--blue);color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.entry-btn:hover{opacity:.88}
+.entry-err{background:var(--red-lt);color:var(--red);border-radius:var(--r-sm);padding:8px 12px;font-size:13px;margin-bottom:.75rem;display:none}
+.entry-err.show{display:block}
+.recent-wrap{margin-top:1rem;text-align:center}
+.recent-label{font-size:11px;color:var(--text-3);margin-bottom:6px}
+.recent-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.name-chip{padding:4px 12px;border-radius:999px;border:1px solid var(--gray-bd);background:var(--gray-lt);font-size:13px;cursor:pointer;color:var(--text-2);font-family:SimSun,serif}
+.name-chip:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── TOPNAV ── */
+.topnav{background:var(--blue-dk);color:#fff;padding:0 1.25rem;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topnav-title{font-size:15px;font-weight:600;font-family:SimSun,serif}
+.topnav-r{display:flex;align-items:center;gap:8px}
+.topnav-user{font-size:13px;opacity:.8}
+.nav-btn{padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;font-size:12px;cursor:pointer}
+.nav-btn:hover{background:rgba(255,255,255,.15)}
+
+/* ── STUDENT GAME ── */
+.game-header{background:linear-gradient(135deg,var(--blue-dk),var(--blue));color:#fff;padding:1.25rem;text-align:center}
+.game-header h1{font-size:18px;font-family:SimSun,serif;margin-bottom:.2rem}
+.game-header p{font-size:12px;opacity:.8}
+.game-body{max-width:680px;margin:0 auto;padding:1rem 1rem 2rem}
+
+.unit-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.unit-tab{padding:7px 12px;border-radius:999px;border:1.5px solid var(--gray-bd);background:#fff;color:var(--text-2);font-size:12px;cursor:pointer;transition:all .15s}
+.unit-tab.active{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+.unit-tab:hover:not(.active){border-color:var(--blue);color:var(--blue)}
+
+.score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.sc{background:#fff;border-radius:var(--r-sm);padding:10px 4px;text-align:center;box-shadow:var(--shadow)}
+.sc-num{font-size:20px;font-weight:700;color:var(--blue)}
+.sc-lbl{font-size:10px;color:var(--text-2);margin-top:2px}
+
+.prog-wrap{background:var(--gray-bd);border-radius:999px;height:5px;margin-bottom:.6rem;overflow:hidden}
+.prog-fill{height:5px;background:var(--green);border-radius:999px;transition:width .4s ease}
+.q-lbl{font-size:11px;color:var(--text-3);margin-bottom:.8rem}
+
+.q-card{background:#fff;border-radius:var(--r);padding:1.25rem;box-shadow:var(--shadow);margin-bottom:.75rem}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+.q-tag{font-size:11px;padding:3px 10px;border-radius:999px;font-weight:600}
+.q-eng{font-size:12px;color:var(--text-2)}
+.q-pinyin{font-size:11px;color:var(--text-3);margin-bottom:.7rem;display:block}
+.q-sent{font-family:SimSun,'宋体',serif;font-size:20px;line-height:2.3;color:var(--text);margin-bottom:1rem}
+.blank{border:none;border-bottom:2.5px solid var(--blue);background:transparent;font-size:19px;font-family:SimSun,serif;color:var(--text);text-align:center;outline:none;padding:0 4px;min-width:64px;transition:border-color .2s}
+.blank.ok{border-color:var(--green);color:var(--green)}
+.blank.bad{border-color:var(--red);color:var(--red)}
+
+.word-bank{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:.9rem}
+.chip{padding:7px 15px;border-radius:999px;border:1.5px solid var(--gray-bd);background:var(--gray-lt);color:var(--text);font-size:17px;font-family:SimSun,serif;cursor:pointer;transition:all .15s;user-select:none}
+.chip:hover{border-color:var(--blue);background:var(--blue-lt);color:var(--blue-dk)}
+.chip.sel{border-color:var(--blue);background:var(--blue-lt);color:var(--blue-dk);font-weight:600}
+.chip.used{opacity:.3;pointer-events:none}
+
+.result-box{border-radius:var(--r-sm);padding:11px 13px;font-size:13px;margin-bottom:.9rem;display:none;line-height:1.5}
+.result-box.show{display:block}
+.result-box.ok{background:var(--green-lt);color:var(--green);border-left:4px solid var(--green)}
+.result-box.bad{background:var(--red-lt);color:var(--red);border-left:4px solid var(--red)}
+.result-box.info{background:var(--blue-lt);color:var(--blue-dk);border-left:4px solid var(--blue)}
+
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:9px 16px;border-radius:var(--r-sm);border:1.5px solid var(--gray-bd);background:#fff;color:var(--text);font-size:13px;cursor:pointer;transition:all .15s}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn-p{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+.btn-p:hover{opacity:.88;color:#fff;border-color:var(--blue)}
+
+.finish{background:#fff;border-radius:var(--r);padding:2rem 1.5rem;text-align:center;box-shadow:var(--shadow-lg);display:none}
+.finish.show{display:block}
+.finish-trophy{font-size:52px;margin-bottom:.75rem}
+.finish-title{font-size:20px;font-weight:700;color:var(--blue-dk);font-family:SimSun,serif;margin-bottom:.25rem}
+.finish-score{font-size:38px;font-weight:700;color:var(--blue);margin:.75rem 0 .25rem}
+.finish-pct{font-size:15px;color:var(--text-2);margin-bottom:.5rem}
+.stars{font-size:28px;letter-spacing:3px;margin-bottom:1.25rem}
+.finish-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:1rem}
+
+/* ── TEACHER DASHBOARD ── */
+.dash-header{background:linear-gradient(135deg,var(--blue-dk),#16A34A);color:#fff;padding:1.75rem 1.5rem}
+.dash-header h1{font-size:22px;font-weight:700;font-family:SimSun,serif;margin-bottom:.2rem}
+.dash-header p{font-size:13px;opacity:.8}
+.dash-body{max-width:960px;margin:0 auto;padding:1.5rem}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:1.75rem}
+.stat{background:#fff;border-radius:var(--r);padding:1.1rem;box-shadow:var(--shadow);text-align:center}
+.stat-icon{font-size:22px;margin-bottom:4px}
+.stat-num{font-size:28px;font-weight:700;color:var(--blue)}
+.stat-lbl{font-size:11px;color:var(--text-2);margin-top:3px}
+
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1.25rem}
+.filter-row label{font-size:13px;color:var(--text-2)}
+.f-select{padding:7px 12px;border-radius:var(--r-sm);border:1.5px solid var(--gray-bd);background:#fff;font-size:13px;cursor:pointer;outline:none}
+.f-select:focus{border-color:var(--blue)}
+
+.sec-title{font-size:15px;font-weight:700;color:var(--blue-dk);margin:.25rem 0 .9rem;font-family:SimSun,serif}
+.player-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:1.75rem}
+.player-card{background:#fff;border-radius:var(--r);padding:1.1rem 1.25rem;box-shadow:var(--shadow)}
+.player-name{font-size:16px;font-weight:700;color:var(--blue-dk);margin-bottom:.4rem;font-family:SimSun,serif}
+.player-pct{font-size:24px;font-weight:700;margin-bottom:.3rem}
+.player-meta{font-size:12px;color:var(--text-2)}
+
+.tbl-wrap{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1.75rem;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:500px}
+th{background:var(--blue-dk);color:#fff;padding:10px 14px;text-align:left;font-size:12px;font-weight:600;white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--gray-lt);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbff}
+.empty td{text-align:center;color:var(--text-3);padding:2rem;font-size:14px}
+
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600}
+.badge-g{background:var(--green-lt);color:var(--green)}
+.badge-o{background:var(--orange-lt);color:var(--orange)}
+.badge-r{background:var(--red-lt);color:var(--red)}
+
+.bar-wrap{background:var(--gray-lt);border-radius:999px;height:7px;width:90px;overflow:hidden;display:inline-block;vertical-align:middle}
+.bar-fill{height:7px;border-radius:999px}
+
+.danger-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-bd)}
+.danger-btn{padding:7px 14px;border-radius:var(--r-sm);background:var(--red-lt);color:var(--red);border:1px solid #fca5a5;font-size:12px;cursor:pointer}
+.danger-btn:hover{background:#fca5a5}
+
+.sync-toast{position:fixed;bottom:16px;right:16px;background:var(--blue-dk);color:#fff;border-radius:999px;padding:8px 16px;font-size:12px;display:none;z-index:999;box-shadow:var(--shadow-lg)}
+.sync-toast.show{display:block}
+
+@media(max-width:480px){
+  .role-row{flex-direction:column}
+  .score-row{grid-template-columns:repeat(2,1fr)}
+  .q-sent{font-size:17px}
+  .entry-card{width:95vw;padding:1.75rem 1.25rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ ENTRY SCREEN -->
+<div id="screen-entry" class="screen active">
+  <div class="entry-card">
+    <div class="entry-logo">🏀</div>
+    <div class="entry-title">中文词语练习</div>
+    <div class="entry-sub">Shanghai American School — Intermediate High</div>
+
+    <div class="entry-err" id="entry-err"></div>
+
+    <div class="role-row">
+      <div class="role-btn sel" id="role-student" onclick="selectRole('student')">
+        <span class="role-icon">🎮</span>
+        <div class="role-name">学生</div>
+        <div class="role-desc">练习词语</div>
+      </div>
+      <div class="role-btn" id="role-teacher" onclick="selectRole('teacher')">
+        <span class="role-icon">📊</span>
+        <div class="role-name">老师</div>
+        <div class="role-desc">查看成绩</div>
+      </div>
+    </div>
+
+    <input class="name-input" id="name-input" placeholder="输入你的名字 / Your name" maxlength="20" onkeydown="if(event.key==='Enter')doEnter()">
+    <input class="pwd-input" id="pwd-input" type="password" placeholder="老师密码 / Teacher password" onkeydown="if(event.key==='Enter')doEnter()">
+
+    <button class="entry-btn" onclick="doEnter()">开始 →</button>
+
+    <div class="recent-wrap" id="recent-wrap" style="display:none">
+      <div class="recent-label">最近使用</div>
+      <div class="recent-chips" id="recent-chips"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ GAME SCREEN -->
+<div id="screen-game" class="screen">
+  <nav class="topnav">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">🏀</span>
+      <span class="topnav-title">中文词语练习</span>
+    </div>
+    <div class="topnav-r">
+      <span class="topnav-user" id="game-username"></span>
+      <button class="nav-btn" onclick="goHome()">退出</button>
+    </div>
+  </nav>
+
+  <div class="game-header">
+    <h1>词语填空游戏 🎮</h1>
+    <p id="game-sub">点击词语填入空白，挑战自己！</p>
+  </div>
+
+  <div class="game-body">
+    <div class="unit-tabs" id="unit-tabs"></div>
+
+    <div class="score-row">
+      <div class="sc"><div class="sc-num" id="s-ok">0</div><div class="sc-lbl">✅ 正确</div></div>
+      <div class="sc"><div class="sc-num" id="s-tot">0</div><div class="sc-lbl">📝 已答</div></div>
+      <div class="sc"><div class="sc-num" id="s-pct">—</div><div class="sc-lbl">🎯 正确率</div></div>
+      <div class="sc"><div class="sc-num" id="s-str">0</div><div class="sc-lbl">🔥 连续</div></div>
+    </div>
+
+    <div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+    <div class="q-lbl" id="q-lbl"></div>
+
+    <div class="q-card" id="q-card">
+      <div class="q-meta">
+        <span class="q-tag" id="q-tag"></span>
+        <span class="q-eng" id="q-eng"></span>
+      </div>
+      <span class="q-pinyin" id="q-pin"></span>
+      <div class="q-sent" id="q-sent"></div>
+      <div class="word-bank" id="word-bank"></div>
+      <div class="result-box" id="result-box"></div>
+      <div class="btn-row">
+        <button class="btn btn-p" id="btn-check" onclick="check()">确认答案</button>
+        <button class="btn" id="btn-next" style="display:none" onclick="nextQ()">下一题 →</button>
+        <button class="btn" style="font-size:12px" onclick="showHint()">💡 提示</button>
+        <button class="btn" style="font-size:12px" onclick="skip()">跳过</button>
+      </div>
+    </div>
+
+    <div class="finish" id="finish">
+      <div class="finish-trophy" id="f-trophy">🏆</div>
+      <div class="finish-title" id="f-title"></div>
+      <div class="stars" id="f-stars"></div>
+      <div class="finish-score" id="f-score"></div>
+      <div class="finish-pct" id="f-pct"></div>
+      <div class="finish-btns">
+        <button class="btn btn-p" onclick="restart()">🔄 再来一次</button>
+        <button class="btn" onclick="switchUnit((curUnit+1)%5)">➡ 下一单元</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ TEACHER SCREEN -->
+<div id="screen-teacher" class="screen">
+  <nav class="topnav">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">📊</span>
+      <span class="topnav-title">老师成绩看板</span>
+    </div>
+    <div class="topnav-r">
+      <span style="font-size:12px;opacity:.65" id="last-refresh"></span>
+      <button class="nav-btn" onclick="refreshDash()">🔄 刷新</button>
+      <button class="nav-btn" onclick="goHome()">退出</button>
+    </div>
+  </nav>
+
+  <div class="dash-header">
+    <h1>📊 学生练习成绩总览</h1>
+    <p>Student Progress Dashboard — Intermediate High Chinese</p>
+  </div>
+
+  <div class="dash-body">
+    <div id="dash-loading" style="text-align:center;padding:3rem;color:var(--text-3);font-size:15px">正在加载数据…</div>
+
+    <div id="dash-content" style="display:none">
+      <div class="stats-grid" id="dash-stats"></div>
+
+      <div class="filter-row">
+        <label>筛选学生：</label>
+        <select class="f-select" id="f-student" onchange="renderDash()">
+          <option value="">全部学生</option>
+        </select>
+        <label>筛选单元：</label>
+        <select class="f-select" id="f-unit" onchange="renderDash()">
+          <option value="">全部单元</option>
+        </select>
+      </div>
+
+      <div class="sec-title">🧑‍🎓 学生总体表现</div>
+      <div class="player-grid" id="dash-players"></div>
+
+      <div class="sec-title">📚 各单元正确率</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>单元</th><th>练习次数</th><th>总答题</th><th>平均正确率</th><th>进度</th><th>状态</th></tr></thead>
+          <tbody id="unit-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="sec-title">📋 详细练习记录（最近100条）</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>时间</th><th>学生</th><th>单元</th><th>得分</th><th>正确率</th><th>状态</th></tr></thead>
+          <tbody id="hist-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="danger-row">
+        <button class="danger-btn" onclick="clearStudent()">🗑 清除选定学生记录</button>
+        <button class="danger-btn" onclick="clearAll()">🗑 清除全部记录</button>
+        <span style="font-size:11px;color:var(--text-3)">清除后不可恢复</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sync-toast" id="sync-toast">✓ 成绩已保存</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  配置（唯一需要设置的地方）
+// ════════════════════════════════════════════════════════════
+const CFG = {
+  teacherPwd: 'teacher888',        // 老师密码，可修改
+  apiKey: '$2a$10$rd4xnp0VZaWWnHY7dlBSTuKd8OHo0/kAHOz31OgZu1XOkmXuamLN2',                       // 留空 = 只存本地；填入 JSONBin Master Key 则云端同步
+  binId:  '6a2e4a9bda38895dfebd5221'                        // JSONBin Bin ID
+};
+// ════════════════════════════════════════════════════════════
+
+const UNIT_NAMES = ['🏀 单元一：体育','🎮 单元二：游戏','🌍 单元三：流行文化','📝 单元四：综合','🔀 全部混合'];
+const UNIT_COLORS = ['#2563EB','#16A34A','#EA580C','#7C3AED','#6B7280'];
+
+const UNITS = [
+  {name:'🏀 体育运动', qs:[
+    {s:'我非常喜欢打___，每天都要训练两个小时。',a:'篮球',c:['篮球','足球','棒球','网球'],h:'NBA的运动',p:'lánqiú',e:'basketball',ex:'篮球(lánqiú) = basketball，NBA就是打篮球！'},
+    {s:'他是我最喜欢的___，在NBA打了十五年。',a:'运动员',c:['运动员','球迷','教练','裁判'],h:'专业打球的人',p:'yùndòng yuán',e:'athlete',ex:'运动员 = athlete，职业打球的人'},
+    {s:'今天的___非常激烈，两队打到了加时赛！',a:'比赛',c:['比赛','训练','表演','考试'],h:'两队之间的对抗',p:'bǐsài',e:'game / match',ex:'比赛(bǐsài) = game or competition'},
+    {s:'他在最后一秒___了！我们队赢了！',a:'得分',c:['得分','失误','犯规','超时'],h:'让分数增加',p:'défēn',e:'to score',ex:'得分(défēn) = to score points，得到分数'},
+    {s:'我们队这次___了，但是下次一定会赢！',a:'输',c:['输','赢','平','退'],h:'比赛没有赢',p:'shū',e:'to lose',ex:'输(shū) = to lose，跟赢相反'},
+    {s:'他训练刻苦，终于成为了今年的___！',a:'冠军',c:['冠军','亚军','球迷','教练'],h:'第一名',p:'guànjūn',e:'champion',ex:'冠军(guànjūn) = champion，第一名！'},
+    {s:'他的___真精彩，球直接进了！',a:'投篮',c:['投篮','传球','运球','防守'],h:'把球投向篮筐',p:'tóulán',e:'to shoot',ex:'投篮(tóulán) = to shoot the basketball'},
+    {s:'他每天___四个小时，从不偷懒。',a:'训练',c:['训练','休息','睡觉','玩游戏'],h:'反复练习以提高水平',p:'xùnliàn',e:'to train',ex:'训练(xùnliàn) = to train / practice'},
+    {s:'这支___在全国联赛里排名第一，非常厉害。',a:'球队',c:['球队','球迷','球场','球员'],h:'一起打球的团队',p:'qiúduì',e:'team',ex:'球队(qiúduì) = sports team'},
+    {s:'他是一个狂热的___，每场比赛都去现场看。',a:'球迷',c:['球迷','球员','教练','裁判'],h:'热爱某支队或球员的人',p:'qiúmí',e:'sports fan',ex:'球迷(qiúmí) = sports fan'},
+  ]},
+  {name:'🎮 游戏科技', qs:[
+    {s:'我最喜欢这个游戏，因为里面的___非常厉害。',a:'角色',c:['角色','场景','音乐','故事'],h:'游戏里你操控的人物',p:'juésè',e:'character',ex:'角色(juésè) = character，游戏里的人物'},
+    {s:'他的___太强了，一下子打败了所有对手。',a:'技能',c:['技能','武器','道具','地图'],h:'角色的特殊能力',p:'jìnéng',e:'skill / ability',ex:'技能(jìnéng) = skill，游戏里的特殊能力'},
+    {s:'我花了三个小时终于通过了这个___。',a:'关卡',c:['关卡','地图','任务','剧情'],h:'游戏里每一个挑战',p:'guānkǎ',e:'level / stage',ex:'关卡(guānkǎ) = level/stage in a game'},
+    {s:'这个游戏的___非常真实，画面很漂亮。',a:'画质',c:['画质','音效','剧情','操控'],h:'图像的清晰程度',p:'huàzhì',e:'graphics quality',ex:'画质(huàzhì) = graphics quality'},
+    {s:'你需要收集___才能升级你的角色。',a:'装备',c:['装备','技能','地图','任务'],h:'穿戴的武器和盔甲',p:'zhuāngbèi',e:'equipment / gear',ex:'装备(zhuāngbèi) = equipment/gear'},
+    {s:'这款手机的___很快，运行游戏毫无压力。',a:'处理器',c:['处理器','屏幕','电池','摄像头'],h:'手机的大脑',p:'chǔlǐqì',e:'processor / CPU',ex:'处理器(chǔlǐqì) = processor/CPU'},
+    {s:'他喜欢和网上的朋友一起___游戏。',a:'联机',c:['联机','单机','下载','更新'],h:'多人在线一起玩',p:'liánjī',e:'online multiplayer',ex:'联机(liánjī) = online multiplayer mode'},
+    {s:'游戏更新后出现了很多___，需要修复。',a:'漏洞',c:['漏洞','关卡','任务','剧情'],h:'游戏里的bug',p:'lòudòng',e:'bug / glitch',ex:'漏洞(lòudòng) = bug/glitch'},
+    {s:'玩游戏要___，不能影响睡眠和学习。',a:'节制',c:['节制','放弃','停止','努力'],h:'有控制地不过度',p:'jiézhì',e:'moderation',ex:'节制(jiézhì) = moderation'},
+    {s:'他___了新游戏之后，马上邀请朋友来玩。',a:'下载',c:['下载','更新','购买','分享'],h:'从网上获取软件',p:'xiàzài',e:'to download',ex:'下载(xiàzài) = to download'},
+  ]},
+  {name:'🌍 流行文化', qs:[
+    {s:'这首歌___好听，我已经循环了一百遍了！',a:'特别',c:['特别','有点','稍微','比较'],h:'程度副词，表示非常',p:'tèbié',e:'especially / very',ex:'特别(tèbié) = especially/very，强调程度高'},
+    {s:'他唱歌的水平___高，难怪这么多人喜欢他。',a:'非常',c:['非常','有点','稍微','比较'],h:'表示程度很高',p:'fēicháng',e:'very / extremely',ex:'非常(fēicháng) = very/extremely'},
+    {s:'他的新专辑一发布就___了，第一天卖了百万张。',a:'爆红',c:['爆红','出名','流行','成功'],h:'突然变得非常火',p:'bào hóng',e:'to go viral',ex:'爆红(bào hóng) = to go viral overnight'},
+    {s:'这个舞蹈在网上___，全世界都在模仿。',a:'流行',c:['流行','出名','爆红','热门'],h:'大家都喜欢',p:'liúxíng',e:'popular / trending',ex:'流行(liúxíng) = popular/trending'},
+    {s:'我最喜欢的球员在比赛中表现___，全场为他喝彩。',a:'出色',c:['出色','普通','一般','还好'],h:'表现得非常好',p:'chūsè',e:'outstanding',ex:'出色(chūsè) = outstanding/excellent'},
+    {s:'这部电影___有意思，但是结局有点奇怪。',a:'虽然',c:['虽然','因为','如果','既然'],h:'表示让步转折',p:'suīrán',e:'although',ex:'虽然…但是… = although...but...'},
+    {s:'他不仅会唱歌，___会跳舞，是全能艺人。',a:'还',c:['还','也','都','又'],h:'表示除此之外还有',p:'hái',e:'also / in addition',ex:'还(hái) = also，追加内容'},
+    {s:'大家都___他能在这次比赛中获得冠军。',a:'相信',c:['相信','希望','觉得','认为'],h:'认为某事是真的',p:'xiāngxìn',e:'to believe',ex:'相信(xiāngxìn) = to believe/trust'},
+    {s:'这位歌手的___太有个人风格，一听就知道是他。',a:'嗓音',c:['嗓音','表演','造型','歌词'],h:'声音的特点',p:'sǎngyīn',e:'voice',ex:'嗓音(sǎngyīn) = voice'},
+    {s:'他从小就___成为职业运动员，每天刻苦训练。',a:'梦想',c:['梦想','希望','计划','决定'],h:'非常希望实现的目标',p:'mèngxiǎng',e:'dream / aspiration',ex:'梦想(mèngxiǎng) = dream/aspiration'},
+  ]},
+  {name:'📝 综合巩固', qs:[
+    {s:'我___篮球和电子游戏，每天都花很多时间在上面。',a:'热衷',c:['热衷','讨厌','喜欢','了解'],h:'非常热情地喜欢',p:'rèzhōng',e:'passionate about',ex:'热衷(rèzhōng) = passionate about，Unit 4词汇！'},
+    {s:'妈妈___我多运动，说这样身体会更健康。',a:'鼓励',c:['鼓励','阻止','帮助','要求'],h:'让别人有信心去做',p:'gǔlì',e:'to encourage',ex:'鼓励(gǔlì) = to encourage，Unit 4核心词汇'},
+    {s:'他___参加了三次比赛，每次都拿了冠军！',a:'连续',c:['连续','偶尔','经常','有时'],h:'一次接一次，不间断',p:'liánxù',e:'consecutively',ex:'连续(liánxù) = consecutively，Unit 4词汇'},
+    {s:'这支球队___很强，在全国联赛里排第一。',a:'通常',c:['通常','偶尔','突然','从来'],h:'大多数情况下',p:'tōngcháng',e:'usually / normally',ex:'通常(tōngcháng) = usually/normally'},
+    {s:'有人觉得打职业篮球是___时间，你怎么看？',a:'浪费',c:['浪费','利用','节省','花费'],h:'用在不值得的地方',p:'làngfèi',e:'to waste',ex:'浪费(làngfèi) = to waste'},
+    {s:'他在田径比赛里跑___，创造了学校纪录！',a:'长跑',c:['长跑','短跑','跳高','跳远'],h:'比较长距离的跑步',p:'cháng pǎo',e:'long-distance running',ex:'长跑(cháng pǎo) = long-distance running'},
+    {s:'学校的运动___每年都吸引很多学生参加。',a:'田径',c:['田径','篮球','游泳','体操'],h:'跑步、跳远、跳高等',p:'tiánjìng',e:'track and field',ex:'田径(tiánjìng) = track and field'},
+    {s:'他是我们学校的运动___，什么体育项目都厉害。',a:'健将',c:['健将','明星','冠军','运动员'],h:'运动能力非常强的人',p:'jiànjiàng',e:'sports ace',ex:'健将(jiànjiàng) = sports champion/ace'},
+    {s:'他获得了___，可以去美国大学读书了！',a:'奖学金',c:['奖学金','奖杯','证书','名次'],h:'给优秀学生的钱或机会',p:'jiǎngxuéjīn',e:'scholarship',ex:'奖学金(jiǎngxuéjīn) = scholarship'},
+    {s:'大家都___他是最好的球员之一。',a:'公认',c:['公认','认为','觉得','相信'],h:'大家都承认的',p:'gōngrèn',e:'universally recognized',ex:'公认(gōngrèn) = universally recognized'},
+  ]},
+];
+
+// ── State ──
+let role='student', player='', curUnit=0, qs=[], qi=0, selAns=null, answered=false;
+let ok=0, tot=0, streak=0;
+let allRecords=[];
+
+// ── Storage helpers ──
+function loadLocal(){try{return JSON.parse(localStorage.getItem('chn_records')||'[]')}catch{return[]}}
+function saveLocal(r){localStorage.setItem('chn_records',JSON.stringify(r))}
+function getRecent(){try{return JSON.parse(localStorage.getItem('chn_recent')||'[]')}catch{return[]}}
+function saveRecent(n){let a=getRecent().filter(x=>x!==n);a.unshift(n);localStorage.setItem('chn_recent',JSON.stringify(a.slice(0,6)))}
+
+async function cloudGet(){
+  if(!CFG.apiKey||!CFG.binId) return loadLocal();
+  try{
+    const r=await fetch(`https://api.jsonbin.io/v3/b/${CFG.binId}/latest`,{headers:{'X-Master-Key':CFG.apiKey}});
+    const d=await r.json();
+    return Array.isArray(d.record?.records)?d.record.records:loadLocal();
+  }catch{return loadLocal()}
+}
+async function cloudSet(records){
+  saveLocal(records);
+  if(!CFG.apiKey||!CFG.binId)return;
+  try{
+    await fetch(`https://api.jsonbin.io/v3/b/${CFG.binId}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':CFG.apiKey},
+      body:JSON.stringify({records})
+    });
+  }catch(e){console.warn('cloud save failed',e)}
+}
+
+// ── Entry ──
+function selectRole(r){
+  role=r;
+  document.getElementById('role-student').classList.toggle('sel',r==='student');
+  document.getElementById('role-teacher').classList.toggle('sel',r==='teacher');
+  document.getElementById('name-input').style.display=r==='student'?'':'none';
+  document.getElementById('pwd-input').style.display=r==='teacher'?'':'none';
+  document.getElementById('recent-wrap').style.display=r==='student'?'':'none';
+  const err=document.getElementById('entry-err'); err.classList.remove('show');
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const r=getRecent();
+  if(r.length){
+    document.getElementById('recent-wrap').style.display='block';
+    document.getElementById('recent-chips').innerHTML=r.map(n=>`<button class="name-chip" onclick="pickName('${n}')">${n}</button>`).join('');
+  }
+});
+function pickName(n){document.getElementById('name-input').value=n;doEnter()}
+
+function showErr(msg){const e=document.getElementById('entry-err');e.textContent=msg;e.classList.add('show')}
+
+function doEnter(){
+  document.getElementById('entry-err').classList.remove('show');
+  if(role==='teacher'){
+    if(document.getElementById('pwd-input').value!==CFG.teacherPwd){showErr('密码错误，请再试一次。');document.getElementById('pwd-input').value='';return}
+    showScreen('screen-teacher'); loadDash();
+  } else {
+    const n=document.getElementById('name-input').value.trim();
+    if(!n){showErr('请输入你的名字！');return}
+    player=n; saveRecent(n);
+    document.getElementById('game-username').textContent=n+' 👋';
+    document.getElementById('game-sub').textContent='欢迎，'+n+'！点击词语填入空白。';
+    showScreen('screen-game'); buildTabs(); switchUnit(0);
+  }
+}
+
+function goHome(){
+  showScreen('screen-entry');
+  document.getElementById('pwd-input').value='';
+  document.getElementById('name-input').value='';
+}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── Game ──
+function buildTabs(){
+  document.getElementById('unit-tabs').innerHTML=UNIT_NAMES.map((n,i)=>`<button class="unit-tab ${i===0?'active':''}" onclick="switchUnit(${i})">${n}</button>`).join('');
+}
+function switchUnit(i){
+  curUnit=i; ok=0; tot=0; streak=0; qi=0;
+  document.querySelectorAll('.unit-tab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  updateSc();
+  if(i===4){let a=[];UNITS.forEach((u,ui)=>u.qs.forEach(q=>a.push({...q,ui})));qs=shuffle(a);}
+  else qs=shuffle(UNITS[i].qs.map(q=>({...q,ui:i})));
+  document.getElementById('finish').classList.remove('show');
+  document.getElementById('q-card').style.display='';
+  document.getElementById('prog').style.width='0%';
+  renderQ();
+}
+function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+
+function renderQ(){
+  if(qi>=qs.length){showFinish();return}
+  const q=qs[qi]; answered=false; selAns=null;
+  document.getElementById('prog').style.width=Math.round(qi/qs.length*100)+'%';
+  document.getElementById('q-lbl').textContent=`第 ${qi+1} 题 / 共 ${qs.length} 题`;
+  const ui=q.ui!==undefined?q.ui:curUnit;
+  const tag=document.getElementById('q-tag');
+  tag.textContent=UNITS[ui].name; tag.style.background=UNIT_COLORS[ui]+'20'; tag.style.color=UNIT_COLORS[ui];
+  document.getElementById('q-eng').textContent=q.e;
+  document.getElementById('q-pin').textContent=q.p;
+  const parts=q.s.split('___');
+  document.getElementById('q-sent').innerHTML=parts.map((p,i)=>i<parts.length-1?p+`<input class="blank" id="b${i}" style="width:${Math.max(64,q.a.length*20)}px" readonly placeholder="___">`:p).join('');
+  document.getElementById('word-bank').innerHTML=shuffle(q.c).map(w=>`<button class="chip" onclick="pick(this,'${w}')">${w}</button>`).join('');
+  const rb=document.getElementById('result-box'); rb.className='result-box'; rb.innerHTML='';
+  document.getElementById('btn-check').style.display='';
+  document.getElementById('btn-next').style.display='none';
+}
+function pick(btn,w){
+  if(answered)return;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+  btn.classList.add('sel'); selAns=w;
+  document.querySelectorAll('.blank').forEach(b=>b.value=w);
+}
+function showHint(){
+  const q=qs[qi],rb=document.getElementById('result-box');
+  rb.className='result-box show info'; rb.innerHTML=`💡 提示：${q.h}（拼音：${q.p}）`;
+}
+function skip(){if(!answered){tot++;streak=0;updateSc()}qi++;renderQ()}
+function check(){
+  if(answered)return;
+  if(!selAns){const rb=document.getElementById('result-box');rb.className='result-box show info';rb.innerHTML='请先选择一个词语！';return}
+  answered=true; const q=qs[qi]; const win=selAns===q.a;
+  tot++; if(win){ok++;streak++;}else streak=0;
+  updateSc();
+  document.querySelectorAll('.blank').forEach(b=>b.classList.add(win?'ok':'bad'));
+  document.querySelectorAll('.chip').forEach(c=>{if(!c.classList.contains('sel'))c.classList.add('used')});
+  const rb=document.getElementById('result-box');
+  rb.className='result-box show '+(win?'ok':'bad');
+  rb.innerHTML=win?`<strong>✅ 正确！</strong><br><span style="font-size:12px">${q.ex}</span>`:`<strong>❌ 正确答案：${q.a}</strong><br><span style="font-size:12px">${q.ex}</span>`;
+  document.getElementById('btn-check').style.display='none';
+  document.getElementById('btn-next').style.display='';
+}
+function nextQ(){qi++;renderQ()}
+function updateSc(){
+  document.getElementById('s-ok').textContent=ok;
+  document.getElementById('s-tot').textContent=tot;
+  document.getElementById('s-pct').textContent=tot>0?Math.round(ok/tot*100)+'%':'—';
+  document.getElementById('s-str').textContent=streak;
+}
+function showFinish(){
+  document.getElementById('q-card').style.display='none';
+  document.getElementById('finish').classList.add('show');
+  document.getElementById('prog').style.width='100%';
+  const pct=tot>0?Math.round(ok/tot*100):0;
+  const trophy=pct>=90?'🏆':pct>=70?'🥇':pct>=50?'👍':'💪';
+  document.getElementById('f-trophy').textContent=trophy;
+  document.getElementById('f-stars').textContent=pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':pct>=50?'⭐':'';
+  document.getElementById('f-title').textContent=pct>=90?'太棒了！你真的很厉害！':pct>=70?'做得不错！继续加油！':pct>=50?'继续练习，会越来越好！':'没关系，多练几次就会了！';
+  document.getElementById('f-score').textContent=`${ok} / ${tot}`;
+  document.getElementById('f-pct').textContent=`正确率 ${pct}%`;
+  saveRecord(pct);
+}
+function restart(){document.getElementById('q-card').style.display='';document.getElementById('finish').classList.remove('show');switchUnit(curUnit)}
+
+async function saveRecord(pct){
+  const toast=document.getElementById('sync-toast');
+  const rec={player,unit:UNIT_NAMES[curUnit],correct:ok,total:tot,pct,time:new Date().toISOString()};
+  const records=await cloudGet();
+  records.push(rec);
+  if(records.length>500)records.splice(0,records.length-500);
+  await cloudSet(records);
+  toast.textContent='✓ 成绩已保存'; toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2500);
+}
+
+// ── Teacher Dashboard ──
+async function loadDash(){
+  document.getElementById('dash-loading').style.display='block';
+  document.getElementById('dash-content').style.display='none';
+  allRecords=await cloudGet();
+  document.getElementById('last-refresh').textContent='更新于 '+new Date().toLocaleTimeString('zh-CN');
+  populateFilters();
+  renderDash();
+  document.getElementById('dash-loading').style.display='none';
+  document.getElementById('dash-content').style.display='block';
+}
+function refreshDash(){loadDash()}
+
+function populateFilters(){
+  const students=[...new Set(allRecords.map(r=>r.player))].sort();
+  const ss=document.getElementById('f-student'); const sv=ss.value;
+  ss.innerHTML='<option value="">全部学生</option>'+students.map(s=>`<option value="${s}"${s===sv?' selected':''}>${s}</option>`).join('');
+  const us=document.getElementById('f-unit'); const uv=us.value;
+  us.innerHTML='<option value="">全部单元</option>'+UNIT_NAMES.map(n=>`<option value="${n}"${n===uv?' selected':''}>${n}</option>`).join('');
+}
+
+function getFiltered(){
+  const fs=document.getElementById('f-student').value;
+  const fu=document.getElementById('f-unit').value;
+  return allRecords.filter(r=>(!fs||r.player===fs)&&(!fu||r.unit===fu));
+}
+
+function renderDash(){
+  const recs=getFiltered();
+  const players=[...new Set(recs.map(r=>r.player))];
+  const avgPct=recs.length?Math.round(recs.map(r=>r.pct).reduce((a,b)=>a+b,0)/recs.length):0;
+  const totalQ=recs.reduce((a,r)=>a+r.total,0);
+  const totalOk=recs.reduce((a,r)=>a+r.correct,0);
+
+  document.getElementById('dash-stats').innerHTML=
+    mkStat('📝',recs.length,'练习次数')+mkStat('🧑‍🎓',players.length,'学生人数')+
+    mkStat('❓',totalQ,'总答题数')+mkStat('🎯',avgPct+'%','平均正确率');
+
+  document.getElementById('dash-players').innerHTML=players.length?players.map(p=>{
+    const pr=recs.filter(r=>r.player===p);
+    const pa=Math.round(pr.map(r=>r.pct).reduce((a,b)=>a+b,0)/pr.length);
+    const col=pa>=80?'var(--green)':pa>=60?'var(--orange)':'var(--red)';
+    return `<div class="player-card"><div class="player-name">👤 ${p}</div>
+      <div class="player-pct" style="color:${col}">${pa}%</div>
+      <div class="player-meta">练习 ${pr.length} 次 · 答题 ${pr.reduce((a,r)=>a+r.total,0)} 道</div>
+      <div style="margin-top:6px">${mkBadge(pa)}</div></div>`;
+  }).join(''):'<div style="color:var(--text-3);font-size:14px;padding:.5rem 0">暂无数据</div>';
+
+  document.getElementById('unit-tbody').innerHTML=UNIT_NAMES.map(name=>{
+    const ur=recs.filter(r=>r.unit===name);
+    if(!ur.length)return `<tr><td>${name}</td><td colspan="5" style="color:var(--text-3)">—</td></tr>`;
+    const ua=Math.round(ur.map(r=>r.pct).reduce((a,b)=>a+b,0)/ur.length);
+    const col=ua>=80?'var(--green)':ua>=60?'var(--orange)':'var(--red)';
+    const uq=ur.reduce((a,r)=>a+r.total,0);
+    return `<tr><td><strong>${name}</strong></td><td>${ur.length}</td><td>${uq}</td>
+      <td><strong style="color:${col}">${ua}%</strong></td>
+      <td><div class="bar-wrap"><div class="bar-fill" style="width:${ua}%;background:${col}"></div></div></td>
+      <td>${mkBadge(ua)}</td></tr>`;
+  }).join('');
+
+  const recent=[...recs].sort((a,b)=>new Date(b.time)-new Date(a.time)).slice(0,100);
+  document.getElementById('hist-tbody').innerHTML=recent.length?recent.map(r=>{
+    const t=new Date(r.time);
+    const ts=t.toLocaleDateString('zh-CN')+' '+t.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+    return `<tr><td style="font-size:11px;color:var(--text-3);white-space:nowrap">${ts}</td>
+      <td><strong>${r.player}</strong></td><td style="font-size:12px">${r.unit}</td>
+      <td>${r.correct}/${r.total}</td>
+      <td><strong style="color:${r.pct>=80?'var(--green)':r.pct>=60?'var(--orange)':'var(--red)'}">${r.pct}%</strong></td>
+      <td>${mkBadge(r.pct)}</td></tr>`;
+  }).join(''):`<tr class="empty"><td colspan="6">暂无练习记录</td></tr>`;
+}
+
+function mkStat(icon,num,lbl){return `<div class="stat"><div class="stat-icon">${icon}</div><div class="stat-num">${num}</div><div class="stat-lbl">${lbl}</div></div>`}
+function mkBadge(p){return p>=80?'<span class="badge badge-g">掌握良好</span>':p>=60?'<span class="badge badge-o">继续加油</span>':'<span class="badge badge-r">需要加强</span>'}
+
+async function clearAll(){
+  if(!confirm('确定清除全部记录？不可恢复！'))return;
+  await cloudSet([]); allRecords=[]; populateFilters(); renderDash();
+}
+async function clearStudent(){
+  const s=document.getElementById('f-student').value;
+  if(!s){alert('请先在筛选里选择一个学生');return}
+  if(!confirm(`确定清除 ${s} 的所有记录？`))return;
+  const keep=allRecords.filter(r=>r.player!==s);
+  await cloudSet(keep); allRecords=keep; populateFilters(); renderDash();
+}
+</script>
+</body>
+</html>
